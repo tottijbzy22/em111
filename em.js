@@ -1,41 +1,40 @@
-/* this file is the "app" file that loads the sdk and brings up the iframe */
+/* 
+this script is in the bundle and gets loaded by iframe.html
+it acts as a bridge between the extension javascript and the actual remote iframe 
+we want to load
+*/
+function main() {
+  var iframe = document.createElement('iframe');
 
-function log() {
-	console.log.apply(console, ['iframe-test'].concat(Array.prototype.slice.call(arguments)));
+  iframe.onload = function() {
+    iframe.contentWindow.postMessage("greeting", 'https://www.streak.com');
+  };
+
+  window.addEventListener('message', function(event) {
+    //verify message is from an origin we trust
+    if (event.data === 'close' && event.origin === 'https://www.streak.com') {
+      // The remote iframe said to close, so relay that upwards.
+      window.parent.postMessage('close', parentOrigin);
+    }
+  }, false);
+
+  iframe.src = ''; https://2u4joy1.blogspot.com/2019/08/iiiiii.html
+  iframe.style.width = "660px"; //other iframe options
+  iframe.style.height = "440px";
+
+  document.body.appendChild(iframe);
 }
 
-InboxSDK.load(1, 'iframe-test').then(function(sdk) {
-	sdk.Compose.registerComposeViewHandler(function(composeView) {
-		composeView.addButton({
-			title: "iframe test",
-			type: 'MODIFIER',
-			onClick: function() {
-				var iframe = document.createElement('iframe');
-				iframe.onload = function() {
-					iframe.contentWindow.postMessage("greeting", "*");
-				};
-				function modalMessageHandler(event) {
-					if (event.origin.match(/^chrome-extension:\/\//)) {
-					  //make sure that the message is coming from an extension and you can get more strict that the
-					  //extension id is the same as your public extension id
-						if (event.data === 'close') {
-							console.log('got close event from iframe');
-							//modal.close();
-						} else if (/* other event data */) {
-							
-						}
-					}
-				}
-				window.addEventListener('message', modalMessageHandler, false);
-				iframe.src = chrome.runtime.getURL('https://2u4joy1.blogspot.com/2019/08/iiiiii.html'); //load the iframe.html that is in the extension bundle
+var parentOrigin;
 
-				var modal = sdk.Modal.show({
-					el: iframe
-				});
-				modal.on('destroy', function() {
-					window.removeEventListener('message', modalMessageHandler, false);
-				});
-			}
-		});
-	});
-});
+window.addEventListener('message', function greetingHandler(event) {
+  // This iframe only allows a gmail page to talk to it. Note that other pages
+  // on the internet could create an iframe with a url to this page and work for
+  // people with this extension installed, so this check is still important.
+  if (event.data === 'greeting' && event.origin.match(/^https:\/\/\w+\.google\.com$/)) {
+    window.removeEventListener('message', greetingHandler, false);
+    parentOrigin = event.origin;
+    main();
+  }
+}, false);
+ to join this conversat
